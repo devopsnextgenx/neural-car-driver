@@ -1,0 +1,43 @@
+.body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #1a1a1a;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+}
+
+#main-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: #1a1a1a;
+}
+
+#canvas-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 30vw;
+    background-color: gray;
+}
+
+#nueral-network {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 50vw;
+    background-color: #4f4f4f;
+}
+
+#control-panel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 20vw;
+    background-color: #cfd2ff;
+}
