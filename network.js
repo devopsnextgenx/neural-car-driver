@@ -7,7 +7,7 @@ class NeuralNetwork {
     }
 
     static feedForward(inputs, network) {
-        let outputs = Level.feedForward(inputs, network.levels[0]);
+        let outputs = inputs;
         for (let i = 0; i < network.levels.length; i++) {
             outputs = Level.feedForward(outputs, network.levels[i]);
         }

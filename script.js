@@ -9,8 +9,8 @@ const carCtx = carCanvas.getContext("2d");
 const road = new Road(carCanvas.width / 2, carCanvas.width * 0.90, 3);
 
 
-const minTrafficCount = 5;
-const maxTrafficCount = 10;
+const minTrafficCount = 3;
+const maxTrafficCount = 7;
 const trafficRangeThreshold = 0.5; // 50% of screen height
 const traffic = [];
 

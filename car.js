@@ -1,5 +1,5 @@
 class Car {
-    constructor(road, lane, index = -1, isTraffic = false, speed = 0, width = 30, height = 50) {
+    constructor(road, lane, index = -1, isTraffic = false, speed = 0, width = 45, height = 60) {
         this.road = road;
         this.lane = lane;
         this.index = index;
@@ -24,11 +24,13 @@ class Car {
         this.crashOnForward = false;
         this.crashOnBackward = false;
 
+        this.steering = 0;
+
         this.useBrain = !isTraffic;
 
         if (this.useBrain) {
             this.sensor = new Sensor(this);
-            this.brain = new NeuralNetwork([this.sensor.rayCount, 6, 6, 4]);
+            this.brain = new NeuralNetwork([this.sensor.rayCount, 5, 5, 4]);
         }
 
         this.controls = new Controls(isTraffic ? "DUMMY" : "AI");
@@ -194,12 +196,10 @@ class Car {
     }
 
     #turn() {
-        if (this.controls.left) {
-            this.angle += 0.04;
-        }
-        if (this.controls.right) {
-            this.angle -= 0.04;
-        }
+        const targetSteering = (this.controls.left ? 1 : 0) - (this.controls.right ? 1 : 0);
+        this.steering = lerp(this.steering, targetSteering, 0.1);
+
+        this.angle += this.steering * 0.04;
 
         this.x -= Math.sin(this.angle) * this.speed;
     }
