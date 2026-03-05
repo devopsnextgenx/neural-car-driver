@@ -1,10 +1,15 @@
 class Car {
-    constructor(road, lane, isTraffic = false, speed = 0, width = 30, height = 50) {
+    constructor(road, lane, index = -1, isTraffic = false, speed = 0, width = 30, height = 50) {
         this.road = road;
         this.lane = lane;
+        this.index = index;
         this.isTraffic = isTraffic;
         this.x = this.road.getLaneCenter(this.lane) + 5;
         this.y = window.innerHeight / 2;
+        if (isTraffic) {
+            this.y = Math.random() * (window.innerHeight);
+        }
+
         this.width = width;
         this.height = height;
 
@@ -12,13 +17,21 @@ class Car {
 
         this.speed = speed;
         this.acceleration = 0.2;
-        this.maxSpeed = 5;
+        this.maxSpeed = 3;
         this.friction = 0.05;
 
-        this.controls = new Controls();
         this.crashed = false;
         this.crashOnForward = false;
         this.crashOnBackward = false;
+
+        this.useBrain = !isTraffic;
+
+        if (this.useBrain) {
+            this.sensor = new Sensor(this);
+            this.brain = new NeuralNetwork([this.sensor.rayCount, 6, 6, 4]);
+        }
+
+        this.controls = new Controls(isTraffic ? "DUMMY" : "AI");
     }
 
     get allowRecover() {
@@ -27,7 +40,7 @@ class Car {
             || this.controls.ctrl;
     }
 
-    draw(ctx, color = "blue") {
+    draw(ctx, color = "blue", drawSensor = false) {
         ctx.save();
 
         ctx.translate(this.x, this.y);
@@ -37,8 +50,11 @@ class Car {
         ctx.beginPath();
         ctx.rect(-this.width / 2, -this.height / 2, this.width, this.height);
         ctx.fill();
-
         ctx.restore();
+        // draw sensor after car
+        if (this.sensor && drawSensor) {
+            this.sensor.draw(ctx);
+        }
     }
 
     update(traffic = []) {
@@ -49,6 +65,11 @@ class Car {
         }
 
         const wasCrashed = this.crashed;
+        if (this.crashed) {
+            this.speed = 0;
+            return;
+        }
+
         // this.polygon is already created above for all cars
         this.crashed = this.#collidesWithBorder();
         this.crashed = this.crashed || this.#collidesWithTraffic(traffic);
@@ -65,6 +86,18 @@ class Car {
 
         if (!this.crashed || this.allowRecover) {
             this.#move();
+        }
+
+        if (this.sensor) {
+            this.sensor.update(this.road.borders, traffic);
+            const offsets = this.sensor.readings.map(s => s.length == 0 ? 0 : 1 - s[0].offset);
+            const outputs = NeuralNetwork.feedForward(offsets, this.brain);
+            if (this.useBrain) {
+                this.controls.forward = outputs[0];
+                this.controls.left = outputs[1] ? 1 : 0;
+                this.controls.right = outputs[2] ? 1 : 0;
+                this.controls.backward = outputs[3];
+            }
         }
     }
 
@@ -100,7 +133,7 @@ class Car {
                         trafficPolygon[k],
                         trafficPolygon[(k + 1) % trafficPolygon.length]
                     )) {
-                        trafficCar.speed = 0;
+                        // trafficCar.speed = 0;
                         return true;
                     }
                 }

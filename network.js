@@ -7,23 +7,24 @@ class NeuralNetwork {
     }
 
     static feedForward(inputs, network) {
-        let outputs = inputs;
+        let outputs = Level.feedForward(inputs, network.levels[0]);
         for (let i = 0; i < network.levels.length; i++) {
             outputs = Level.feedForward(outputs, network.levels[i]);
         }
         return outputs;
     }
 
-    static mutate(network, mutationRate = 0.1) {
-        for (let i = 0; i < network.levels.length; i++) {
-            for (let j = 0; j < network.levels[i].weights.length; j++) {
-                for (let k = 0; k < network.levels[i].weights[j].length; k++) {
-                    if (Math.random() < mutationRate) {
-                        network.levels[i].weights[j][k] += Math.random() * 2 - 1;
-                    }
+    static mutate(network, rate = 1) {
+        network.levels.forEach(level => {
+            for (let i = 0; i < level.biases.length; i++) {
+                level.biases[i] += lerp(level.biases[i], Math.random() * 2 - 1, rate);
+            }
+            for (let i = 0; i < level.weights.length; i++) {
+                for (let j = 0; j < level.weights[i].length; j++) {
+                    level.weights[i][j] += lerp(level.weights[i][j], Math.random() * 2 - 1, rate);
                 }
             }
-        }
+        });
     }
 }
 
@@ -59,13 +60,19 @@ class Level {
         }
 
         for (let i = 0; i < level.outputs.length; i++) {
-            let sum = level.biases[i];
+            let sum = 0;
             for (let j = 0; j < level.inputs.length; j++) {
                 sum += level.inputs[j] * level.weights[j][i];
             }
-            level.outputs[i] = sum;
+
+            if (sum > level.biases[i]) {
+                level.outputs[i] = 1;
+            } else {
+                level.outputs[i] = 0;
+            }
         }
 
         return level.outputs;
     }
+
 }
