@@ -59,7 +59,7 @@ button:hover {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    width: 30vw;
+    width: 50vw;
     background-color: gray;
 }
 
@@ -72,11 +72,11 @@ button:hover {
     background-color: #000000;
 }
 
-#control-panel {
+/* #control-panel {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     width: 20vw;
     background-color: #cfd2ff;
-}
+} */

@@ -36,7 +36,7 @@ function updateTraffic() {
     if (traffic.length < minTrafficCount + Math.random() * (maxTrafficCount - minTrafficCount)) {
         const lane = Math.floor(Math.random() * road.laneCount);
         // Traffic speed lower than car.maxSpeed, with some variation (1 to maxSpeed-1)
-        const speedVariation = Math.random() * (bestCar.maxSpeed - 2) + 1;
+        const speedVariation = 2 + Math.random() * 1.2;
 
         // Spawn ahead of the car (randomly at the top of the road within view/buffer)
         // car.y is the vertical position. Lower y is "ahead".

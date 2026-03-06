@@ -30,10 +30,29 @@ class Car {
 
         if (this.useBrain) {
             this.sensor = new Sensor(this);
-            this.brain = new NeuralNetwork([this.sensor.rayCount, 5, 5, 4]);
+            this.brain = new NeuralNetwork([this.sensor.rayCount, 4, 4]);
         }
 
         this.controls = new Controls(isTraffic ? "DUMMY" : "AI");
+        
+        this.img=new Image();
+        this.img.src="car.png"
+
+        this.mask=document.createElement("canvas");
+        this.mask.width=width;
+        this.mask.height=height;
+
+        const color= isTraffic ? getRandomColor() : "blue";
+
+        const maskCtx=this.mask.getContext("2d");
+        this.img.onload=()=>{
+            maskCtx.fillStyle=color;
+            maskCtx.rect(0,0,this.width,this.height);
+            maskCtx.fill();
+
+            maskCtx.globalCompositeOperation="destination-atop";
+            maskCtx.drawImage(this.img,0,0,this.width,this.height);
+        }
     }
 
     get allowRecover() {
@@ -43,20 +62,67 @@ class Car {
     }
 
     draw(ctx, color = "blue", drawSensor = false) {
-        ctx.save();
-
-        ctx.translate(this.x, this.y);
-        ctx.rotate(-this.angle);
-        // make blue transparent
-        ctx.fillStyle = this.crashed ? this.crashOnForward ? "rgba(255, 0, 0, 0.45)" : "rgba(0, 255, 0, 0.45)" : color;
-        ctx.beginPath();
-        ctx.rect(-this.width / 2, -this.height / 2, this.width, this.height);
-        ctx.fill();
-        ctx.restore();
         // draw sensor after car
         if (this.sensor && drawSensor) {
             this.sensor.draw(ctx);
         }
+        
+        ctx.save();
+        ctx.translate(this.x,this.y);
+        ctx.rotate(-this.angle);
+        if(!this.crashed) {
+            ctx.drawImage(this.mask,
+                -this.width/2,
+                -this.height/2,
+                this.width,
+                this.height);
+            ctx.globalCompositeOperation="multiply";
+        } else {
+            
+        
+            if (this.crashOnForward) {
+                this.maskForwardCrash = document.createElement("canvas");
+                this.maskForwardCrash.width=this.width;
+                this.maskForwardCrash.height=this.height;
+                const maskForwardCrashCtx = this.maskForwardCrash.getContext("2d");
+                this.img.onload = () => {
+                    maskForwardCrashCtx.fillStyle = "red";
+                    maskForwardCrashCtx.rect(0, 0, this.width, this.height);
+                    maskForwardCrashCtx.fill();
+                    maskForwardCrashCtx.globalCompositeOperation = "destination-atop";
+                    maskForwardCrashCtx.drawImage(this.img, 0, 0, this.width, this.height);
+                }
+                ctx.drawImage(this.maskForwardCrash,
+                    -this.width/2,
+                    -this.height/2,
+                    this.width,
+                    this.height);
+            } else if (this.crashOnBackward) {
+                        
+                this.maskBackwardCrash = document.createElement("canvas");
+                this.maskBackwardCrash.width=this.width;
+                this.maskBackwardCrash.height=this.height;
+                const maskBackwardCrashCtx = this.maskBackwardCrash.getContext("2d");
+                this.img.onload = () => {
+                    maskBackwardCrashCtx.fillStyle = "green";
+                    maskBackwardCrashCtx.rect(0, 0, this.width, this.height);
+                    maskBackwardCrashCtx.fill();
+                    maskBackwardCrashCtx.globalCompositeOperation = "destination-atop";
+                    maskBackwardCrashCtx.drawImage(this.img, 0, 0, this.width, this.height);
+                }
+                ctx.drawImage(this.maskBackwardCrash,
+                    -this.width/2,
+                    -this.height/2,
+                    this.width,
+                    this.height);
+            }
+        }
+        ctx.drawImage(this.img,
+            -this.width/2,
+            -this.height/2,
+            this.width,
+            this.height);
+        ctx.restore();
     }
 
     update(traffic = []) {
