@@ -30,28 +30,28 @@ class Car {
 
         if (this.useBrain) {
             this.sensor = new Sensor(this);
-            this.brain = new NeuralNetwork([this.sensor.rayCount, 4, 4]);
+            this.brain = new NeuralNetwork([this.sensor.rayCount, 6, 4]);
         }
 
         this.controls = new Controls(isTraffic ? "DUMMY" : "AI");
-        
-        this.img=new Image();
-        this.img.src="car.png"
 
-        this.mask=document.createElement("canvas");
-        this.mask.width=width;
-        this.mask.height=height;
+        this.img = new Image();
+        this.img.src = "car.png"
 
-        const color= isTraffic ? getRandomColor() : "blue";
+        this.mask = document.createElement("canvas");
+        this.mask.width = width;
+        this.mask.height = height;
 
-        const maskCtx=this.mask.getContext("2d");
-        this.img.onload=()=>{
-            maskCtx.fillStyle=color;
-            maskCtx.rect(0,0,this.width,this.height);
+        const color = isTraffic ? getRandomColor() : "blue";
+
+        const maskCtx = this.mask.getContext("2d");
+        this.img.onload = () => {
+            maskCtx.fillStyle = color;
+            maskCtx.rect(0, 0, this.width, this.height);
             maskCtx.fill();
 
-            maskCtx.globalCompositeOperation="destination-atop";
-            maskCtx.drawImage(this.img,0,0,this.width,this.height);
+            maskCtx.globalCompositeOperation = "destination-atop";
+            maskCtx.drawImage(this.img, 0, 0, this.width, this.height);
         }
     }
 
@@ -66,24 +66,24 @@ class Car {
         if (this.sensor && drawSensor) {
             this.sensor.draw(ctx);
         }
-        
+
         ctx.save();
-        ctx.translate(this.x,this.y);
+        ctx.translate(this.x, this.y);
         ctx.rotate(-this.angle);
-        if(!this.crashed) {
+        if (!this.crashed) {
             ctx.drawImage(this.mask,
-                -this.width/2,
-                -this.height/2,
+                -this.width / 2,
+                -this.height / 2,
                 this.width,
                 this.height);
-            ctx.globalCompositeOperation="multiply";
+            ctx.globalCompositeOperation = "multiply";
         } else {
-            
-        
+
+
             if (this.crashOnForward) {
                 this.maskForwardCrash = document.createElement("canvas");
-                this.maskForwardCrash.width=this.width;
-                this.maskForwardCrash.height=this.height;
+                this.maskForwardCrash.width = this.width;
+                this.maskForwardCrash.height = this.height;
                 const maskForwardCrashCtx = this.maskForwardCrash.getContext("2d");
                 this.img.onload = () => {
                     maskForwardCrashCtx.fillStyle = "red";
@@ -93,15 +93,15 @@ class Car {
                     maskForwardCrashCtx.drawImage(this.img, 0, 0, this.width, this.height);
                 }
                 ctx.drawImage(this.maskForwardCrash,
-                    -this.width/2,
-                    -this.height/2,
+                    -this.width / 2,
+                    -this.height / 2,
                     this.width,
                     this.height);
             } else if (this.crashOnBackward) {
-                        
+
                 this.maskBackwardCrash = document.createElement("canvas");
-                this.maskBackwardCrash.width=this.width;
-                this.maskBackwardCrash.height=this.height;
+                this.maskBackwardCrash.width = this.width;
+                this.maskBackwardCrash.height = this.height;
                 const maskBackwardCrashCtx = this.maskBackwardCrash.getContext("2d");
                 this.img.onload = () => {
                     maskBackwardCrashCtx.fillStyle = "green";
@@ -111,15 +111,15 @@ class Car {
                     maskBackwardCrashCtx.drawImage(this.img, 0, 0, this.width, this.height);
                 }
                 ctx.drawImage(this.maskBackwardCrash,
-                    -this.width/2,
-                    -this.height/2,
+                    -this.width / 2,
+                    -this.height / 2,
                     this.width,
                     this.height);
             }
         }
         ctx.drawImage(this.img,
-            -this.width/2,
-            -this.height/2,
+            -this.width / 2,
+            -this.height / 2,
             this.width,
             this.height);
         ctx.restore();
